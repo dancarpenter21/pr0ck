@@ -8,11 +8,14 @@ public class ProckFileInputStream extends FileInputStream {
 	private final ProckFile file;
 	
 	private int bytesRead = 0;
+	private int readLimit = -1;
+	private long mark = 0;
 	
 	public ProckFileInputStream(ProckFile file) throws IOException {
 		super(file.getBaseFile());
 		this.file = file;
 		super.getChannel().position(file.getOffset());
+		mark = super.getChannel().position();
 	}
 	
 	@Override
@@ -20,7 +23,9 @@ public class ProckFileInputStream extends FileInputStream {
 		if (available() > 0) {
 			int byteValue = super.read();
 			if (byteValue > -1) {
-				bytesRead++;
+				if (bytesRead > -1) {
+					bytesRead++;
+				}
 			}
 			
 			return byteValue;
@@ -61,14 +66,17 @@ public class ProckFileInputStream extends FileInputStream {
 
 	@Override
 	public synchronized void mark(int readlimit) {
-		// TODO Auto-generated method stub
-		super.mark(readlimit);
+		try {
+			mark = super.getChannel().position();
+		} catch (IOException e) {
+			mark = 0;
+		}
 	}
 
 	@Override
 	public synchronized void reset() throws IOException {
-		// TODO Auto-generated method stub
-		super.reset();
+		super.getChannel().position(mark);
+		bytesRead = -1;
 	}
 
 	@Override
