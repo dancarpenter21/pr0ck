@@ -5,6 +5,7 @@ import java.io.IOException;
 
 public class ProckFileInputStream extends FileInputStream {
 
+	private final Object markLock = new Object();
 	private final ProckFile file;
 	
 	private int bytesRead = 0;
@@ -23,8 +24,11 @@ public class ProckFileInputStream extends FileInputStream {
 		if (available() > 0) {
 			int byteValue = super.read();
 			if (byteValue > -1) {
-				if (bytesRead > -1) {
-					bytesRead++;
+				synchronized (markLock) {
+					if (readLimit > -1) {
+						bytesRead++;
+						checkReadLimit();
+					}
 				}
 			}
 			
@@ -47,15 +51,35 @@ public class ProckFileInputStream extends FileInputStream {
 		}
 
 		if (len > available) {
-			return super.read(b, off, available);
+			return markRead(b, off, available);
 		} else {
-			return super.read(b, off, len);
+			return markRead(b, off, len);
 		}
+	}
+	
+	private int markRead(byte[] b, int off, int len) throws IOException {
+		int read = super.read(b, off, len);
+		synchronized (markLock) {
+			if (readLimit > -1) {
+				bytesRead += read;
+				checkReadLimit();
+			}
+		}
+		
+		return read;
 	}
 
 	@Override
 	public long skip(long n) throws IOException {
-		return super.skip(n);
+		long skipped = super.skip(n);
+		synchronized (markLock) {
+			if (readLimit > -1) {
+				bytesRead += skipped;
+				checkReadLimit();
+			}
+		}
+
+		return skipped;
 	}
 
 
@@ -66,18 +90,24 @@ public class ProckFileInputStream extends FileInputStream {
 
 	@Override
 	public synchronized void mark(int readlimit) {
-		try {
-			mark = super.getChannel().position();
-			this.readLimit = readlimit;
-		} catch (IOException e) {
-			mark = 0;
+		synchronized (markLock) {
+			try {
+				mark = super.getChannel().position();
+				this.readLimit = readlimit;
+				bytesRead = 0;
+			} catch (IOException e) {
+				mark = 0;
+			}
 		}
 	}
 
 	@Override
 	public synchronized void reset() throws IOException {
-		super.getChannel().position(mark);
-		bytesRead = -1;
+		synchronized (markLock) {
+			super.getChannel().position(mark);
+			bytesRead = 0;
+			readLimit = -1;
+		}
 	}
 
 	@Override
@@ -85,5 +115,11 @@ public class ProckFileInputStream extends FileInputStream {
 		return true;
 	}
 	
+	private void checkReadLimit() {
+		if (bytesRead > readLimit) {
+			bytesRead = 0;
+			readLimit = -1;
+		}
+	}
 	
 }

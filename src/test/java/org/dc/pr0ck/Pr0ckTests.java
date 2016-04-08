@@ -15,8 +15,8 @@ import org.junit.Test;
 public class Pr0ckTests {
 	
 	private static final String PASSWORD = "senator";
-	private static final File SOURCE_DIRECTORY = new File("/media/martiuser/508cda5f-fadb-46e5-9b63-768ceb6d97a7/Personal/.funs/Organized/Wrestling/pr0ck/");
-	private static final File OUTPUT_FILE = new File("/home/martiuser/output.pr0ck");
+	private static final File SOURCE_DIRECTORY = new File("./src/test/resources/");
+	private static final File OUTPUT_FILE = new File("./src/test/resources/test.pr0ck");
 	
 	@Test
 	public void testMime() throws IOException, ProckPasswordException, ProckXmlException, ProckException {

@@ -33,7 +33,8 @@ public class DomProckBuilder extends EventedProckBuilder {
 	public DomProckBuilder(File sourceDirectory) throws ParserConfigurationException {
 		super(sourceDirectory);
 
-		document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		document = factory.newDocumentBuilder().newDocument();
 		root = document.createElement(ProckConstants.ROOT_ELEMENT_NAME);
 		document.appendChild(root);
 	}
@@ -125,7 +126,7 @@ public class DomProckBuilder extends EventedProckBuilder {
 			stream.flush();
 			
 		} catch (TransformerException e) {
-			onError(e, "XPath issue");
+			throw new IOException(e);
 		} finally {
 			stream.close();
 		}
