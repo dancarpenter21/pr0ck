@@ -68,6 +68,7 @@ public class ProckFileInputStream extends FileInputStream {
 	public synchronized void mark(int readlimit) {
 		try {
 			mark = super.getChannel().position();
+			this.readLimit = readlimit;
 		} catch (IOException e) {
 			mark = 0;
 		}

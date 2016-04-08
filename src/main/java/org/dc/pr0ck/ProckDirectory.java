@@ -1,6 +1,7 @@
 package org.dc.pr0ck;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -138,8 +139,16 @@ public class ProckDirectory {
 		return null;
 	}
 	
-	public void newFile(File prockFile, String name, long length, long offset) throws ProckException {
-		add(new ProckFile(prockFile, name, length, offset, this));
+	public ProckFile newFile(FileDescriptor prockFile, String name, long length, long offset) throws ProckException {
+		ProckFile file = new ProckFile(prockFile, name, length, offset, this);
+		add(file);
+		return file;
+	}
+	
+	public ProckFile newFile(File prockFile, String name, long length, long offset) throws ProckException {
+		ProckFile file = new ProckFile(prockFile, name, length, offset, this);
+		add(file);
+		return file;
 	}
 	
 	/**

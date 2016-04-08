@@ -1,8 +1,8 @@
 package org.dc.pr0ck;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -10,10 +10,17 @@ public abstract class ProckReader {
 	
 	private String password = null;
 	protected final File prockFile;
+	protected final FileDescriptor prockFileDescriptor;
 	private long endOfHeader = -1;
 
-	public ProckReader(File prockFile) throws FileNotFoundException {
+	public ProckReader(FileDescriptor prockFileDescriptor) {
+		this.prockFileDescriptor = prockFileDescriptor;
+		prockFile = null;
+	}
+	
+	public ProckReader(File prockFile) {
 		this.prockFile = prockFile;
+		prockFileDescriptor = null;
 	}
 	
 	/**
@@ -27,7 +34,13 @@ public abstract class ProckReader {
 	 * @throws ProckException 
 	 */
 	public ProckDirectory load() throws IOException, ProckPasswordException, ProckXmlException, ProckException {
-		FileInputStream stream = new FileInputStream(prockFile);
+		FileInputStream stream = null;
+		if (prockFile != null) {
+			stream = new FileInputStream(prockFile);
+		} else if (prockFileDescriptor != null) {
+			stream = new FileInputStream(prockFileDescriptor);
+		}
+
 		try {
 			int passwordByte = stream.read();
 			if (passwordByte == 1) {
@@ -41,7 +54,7 @@ public abstract class ProckReader {
 			endOfHeader = stream.getChannel().position();
 			return getRootDirectory(xmlHeader, endOfHeader);
 		} finally {
-			stream.close();
+			if (stream != null) stream.close();
 		}
 	}
 	

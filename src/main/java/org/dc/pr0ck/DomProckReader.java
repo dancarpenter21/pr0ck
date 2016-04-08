@@ -2,7 +2,7 @@ package org.dc.pr0ck;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.FileDescriptor;
 import java.io.IOException;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,7 +18,11 @@ public class DomProckReader extends ProckReader {
 	
 	private Document document = null;
 
-	public DomProckReader(File prockFile) throws FileNotFoundException {
+	public DomProckReader(FileDescriptor prockFileDescriptor) {
+		super(prockFileDescriptor);
+	}
+	
+	public DomProckReader(File prockFile) {
 		super(prockFile);
 	}
 
@@ -52,7 +56,12 @@ public class DomProckReader extends ProckReader {
 					String name = e.getAttribute(ProckConstants.NAME_ATTRIBUTE_NAME);
 					long length = Long.parseLong(e.getAttribute(ProckConstants.LENGTH_ATTRIBUTE_NAME));
 					long offset = Long.parseLong(e.getAttribute(ProckConstants.OFFSET_ATTRIBUTE_NAME));
-					currentDirectory.newFile(prockFile, name, length, offset + endOfHeader);
+					
+					if (prockFile != null) {
+						currentDirectory.newFile(prockFile, name, length, offset + endOfHeader);
+					} else {
+						currentDirectory.newFile(prockFileDescriptor, name, length, offset + endOfHeader);
+					}
 				}
 			}
 		}

@@ -71,11 +71,11 @@ public class Pr0ckTests {
 		bbbb.add(cccc);
 		bbbbb.add(ccccc);
 		
-		c.newFile(null, "d.file", 0, 1);
-		cc.newFile(null, "dd.file", 0, 1);
-		ccc.newFile(null, "ddd.file", 0, 1);
-		cccc.newFile(null, "dddd.file", 0, 1);
-		ccccc.newFile(null, "ddddd.file", 0, 1);
+		c.newFile(new File("."), "d.file", 0, 1);
+		cc.newFile(new File("."), "dd.file", 0, 1);
+		ccc.newFile(new File("."), "ddd.file", 0, 1);
+		cccc.newFile(new File("."), "dddd.file", 0, 1);
+		ccccc.newFile(new File("."), "ddddd.file", 0, 1);
 		
 		assertNotNull(root.searchDirectory("a/b/c"));
 		assertNotNull(root.searchDirectory("a/b/c/"));
