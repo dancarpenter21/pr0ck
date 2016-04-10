@@ -15,8 +15,9 @@ import org.junit.Test;
 public class Pr0ckTests {
 	
 	private static final String PASSWORD = "senator";
-	private static final File SOURCE_DIRECTORY = new File("./src/test/resources/");
+	private static final File SOURCE_DIRECTORY = new File("./src/test/resources/pr0ck/");
 	private static final File OUTPUT_FILE = new File("./src/test/resources/test.pr0ck");
+	private static final File OUTPUT_TEST_DIR = new File("./src/test/resources/testOutputs/");
 	
 	@Test
 	public void testMime() throws IOException, ProckPasswordException, ProckXmlException, ProckException {
@@ -25,9 +26,9 @@ public class Pr0ckTests {
 		ProckDirectory rootDirectory = reader.load();
 		printDirectory(rootDirectory);
 		
-		String prockPath1 = "Stills/dt693_1100/00001608.jpg";
+		String prockPath1 = "Dir/bird_gif.gif";
 		ProckFile file1 = rootDirectory.searchFile(prockPath1);
-		ProckFileInputStream stream1 = new ProckFileInputStream(file1);
+		ProckFileInputStream stream1 = ProckFileInputStream.open(file1);
 		try {
 			
 		} finally {
@@ -106,21 +107,24 @@ public class Pr0ckTests {
 	
 	@Test
 	public void testReader() throws IOException, ProckException {
+		if (!OUTPUT_TEST_DIR.exists()) {
+			OUTPUT_TEST_DIR.mkdirs();
+		}
 		ProckReader reader = new DomProckReader(OUTPUT_FILE);
 		reader.setPassword(PASSWORD);
 		ProckDirectory rootDirectory = reader.load();
 		printDirectory(rootDirectory);
 		
-		String prockPath1 = "Stills/jpegDT693/00001608.jpg";
+		String prockPath1 = "Dir/bird_gif.gif";
 		ProckFile file1 = rootDirectory.searchFile(prockPath1);
-		ProckFileInputStream stream1 = new ProckFileInputStream(file1);
+		ProckFileInputStream stream1 = ProckFileInputStream.open(file1);
 		try {
 			byte[] buffer = new byte[(int) file1.getLength()];
 			stream1.read(buffer);
 
 			assertTrue(String.valueOf(stream1.available()), stream1.available() == 0);
 			
-			FileOutputStream testImage = new FileOutputStream("testImage1.jpg");
+			FileOutputStream testImage = new FileOutputStream(new File(OUTPUT_TEST_DIR, "testOutput1.gif"));
 			try {
 				testImage.write(buffer);
 				testImage.flush();
@@ -133,13 +137,13 @@ public class Pr0ckTests {
 			stream1.close();
 		}
 		
-		String prockPath2 = "Stills/jpegDT693/00001621.jpg";
+		String prockPath2 = "test_mp4.mp4";
 		ProckFile file2 = rootDirectory.searchFile(prockPath2);
-		ProckFileInputStream stream2 = new ProckFileInputStream(file2);
+		ProckFileInputStream stream2 = ProckFileInputStream.open(file2);
 		try {
 			byte[] buffer = new byte[1024];
 			int bytesRead = -1;
-			FileOutputStream testImage = new FileOutputStream("testImage2.jpg");
+			FileOutputStream testImage = new FileOutputStream(new File(OUTPUT_TEST_DIR, "testOutput2.mp4"));
 			try {
 				while ((bytesRead = stream2.read(buffer)) > -1) {
 					testImage.write(buffer, 0, bytesRead);
@@ -155,13 +159,13 @@ public class Pr0ckTests {
 			stream2.close();
 		}
 
-		String prockPath3 = "DT-693-01DL Topple the Topless - Tylene Buck v JC Marie.mp4";
+		String prockPath3 = "test_webm.webm";
 		ProckFile file3 = rootDirectory.searchFile(prockPath3);
-		ProckFileInputStream stream3 = new ProckFileInputStream(file3);
+		ProckFileInputStream stream3 = ProckFileInputStream.open(file3);
 		try {
 			byte[] buffer = new byte[8192];
 			int bytesRead = -1;
-			FileOutputStream testImage = new FileOutputStream("dt693");
+			FileOutputStream testImage = new FileOutputStream(new File(OUTPUT_TEST_DIR, "testOutput3.webm"));
 			try {
 				while ((bytesRead = stream3.read(buffer)) > -1) {
 					testImage.write(buffer, 0, bytesRead);

@@ -1,21 +1,38 @@
 package org.dc.pr0ck;
 
+import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
 
 public class ProckFileInputStream extends FileInputStream {
 
+	public static ProckFileInputStream open(ProckFile file) throws IOException {
+		if (file.getBaseFile() != null) {
+			return new ProckFileInputStream(file, file.getBaseFile());
+		} else {
+			return new ProckFileInputStream(file, file.getBaseFileDescriptor());
+		}
+	}
+
 	private final Object markLock = new Object();
-	private final ProckFile file;
+	private final ProckFile prockFile;
 	
 	private int bytesRead = 0;
 	private int readLimit = -1;
 	private long mark = 0;
 	
-	public ProckFileInputStream(ProckFile file) throws IOException {
-		super(file.getBaseFile());
-		this.file = file;
-		super.getChannel().position(file.getOffset());
+	private ProckFileInputStream(ProckFile prockFile, File file) throws IOException {
+		super(file);
+		this.prockFile = prockFile;
+		super.getChannel().position(prockFile.getOffset());
+		mark = super.getChannel().position();
+	}
+	
+	private ProckFileInputStream(ProckFile prockFile, FileDescriptor file) throws IOException {
+		super(file);
+		this.prockFile = prockFile;
+		super.getChannel().position(prockFile.getOffset());
 		mark = super.getChannel().position();
 	}
 	
@@ -85,7 +102,7 @@ public class ProckFileInputStream extends FileInputStream {
 
 	@Override
 	public int available() throws IOException {
-		return (int) (file.getLength() + file.getOffset() - super.getChannel().position());
+		return (int) (prockFile.getLength() + prockFile.getOffset() - super.getChannel().position());
 	}
 
 	@Override
