@@ -4,6 +4,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,13 +32,13 @@ public class Pr0ckTests {
 
 		String prockPath1 = "Dir/bird_gif.gif";
 		ProckFile file1 = rootDirectory.searchFile(prockPath1);
-		ProckFileInputStream stream1 = ProckFileInputStream.open(file1);
+		BufferedInputStream bis = null;
 		try {
-			String mime = tika.detect(stream1);
+			String mime = tika.detect(bis = new BufferedInputStream(ProckFileInputStream.open(file1)));
 			System.out.println(mime);
 			assertTrue("Unexpected mime", "image/gif".equals(mime));
 		} finally {
-			stream1.close();
+			bis.close();
 		}
 		
 		String prockPath2 = "test_mp4.mp4";

@@ -5,6 +5,12 @@ import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+/**
+ * Wrapping this stream in a {@link java.io.BufferedInputStream BufferedInputStream}
+ * seems to improve performance significantly when probing for MIME types using Tika.
+ * 
+ * @author Dc
+ */
 public class ProckFileInputStream extends FileInputStream {
 
 	public static ProckFileInputStream open(ProckFile file) throws IOException {
