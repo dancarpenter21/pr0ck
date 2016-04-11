@@ -122,7 +122,7 @@ public class ProckFileInputStream extends FileInputStream {
 	public synchronized void reset() throws IOException {
 		synchronized (markLock) {
 			if (readLimit == -1) {
-				throw new IOException("Illegal state.");
+				throw new IOException("mark() not called");
 			}
 
 			super.getChannel().position(mark);

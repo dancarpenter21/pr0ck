@@ -10,6 +10,7 @@ import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.tika.Tika;
 import org.junit.Test;
 
 public class Pr0ckTests {
@@ -26,13 +27,39 @@ public class Pr0ckTests {
 		ProckDirectory rootDirectory = reader.load();
 		printDirectory(rootDirectory);
 		
+		Tika tika = new Tika();
+
 		String prockPath1 = "Dir/bird_gif.gif";
 		ProckFile file1 = rootDirectory.searchFile(prockPath1);
 		ProckFileInputStream stream1 = ProckFileInputStream.open(file1);
 		try {
-			
+			String mime = tika.detect(stream1);
+			System.out.println(mime);
+			assertTrue("Unexpected mime", "image/gif".equals(mime));
 		} finally {
 			stream1.close();
+		}
+		
+		String prockPath2 = "test_mp4.mp4";
+		ProckFile file2 = rootDirectory.searchFile(prockPath2);
+		ProckFileInputStream stream2 = ProckFileInputStream.open(file2);
+		try {
+			String mime = tika.detect(stream2);
+			System.out.println(mime);
+			assertTrue("Unexpected mime", "video/mp4".equals(mime));
+		} finally {
+			stream2.close();
+		}
+
+		String prockPath3 = "test_webm.webm";
+		ProckFile file3 = rootDirectory.searchFile(prockPath3);
+		ProckFileInputStream stream3 = ProckFileInputStream.open(file3);
+		try {
+			String mime = tika.detect(stream3);
+			System.out.println(mime);
+			assertTrue("Unexpected mime", "application/x-matroska".equals(mime));
+		} finally {
+			stream3.close();
 		}
 	}
 	
