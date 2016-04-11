@@ -16,12 +16,12 @@ public class Pr0ckTests {
 	
 	private static final String PASSWORD = "senator";
 	private static final File SOURCE_DIRECTORY = new File("./src/test/resources/pr0ck/");
-	private static final File OUTPUT_FILE = new File("./src/test/resources/test.pr0ck");
+	private static final File TEST_FILE = new File("./src/test/resources/test.pr0ck");
 	private static final File OUTPUT_TEST_DIR = new File("./src/test/resources/testOutputs/");
 	
 	@Test
 	public void testMime() throws IOException, ProckPasswordException, ProckXmlException, ProckException {
-		ProckReader reader = new DomProckReader(OUTPUT_FILE);
+		ProckReader reader = new DomProckReader(TEST_FILE);
 		reader.setPassword(PASSWORD);
 		ProckDirectory rootDirectory = reader.load();
 		printDirectory(rootDirectory);
@@ -92,17 +92,17 @@ public class Pr0ckTests {
 	
 	@Test
 	public void testBuilder() throws IOException, ParserConfigurationException {
-		if (OUTPUT_FILE.exists()) {
-			assertTrue(OUTPUT_FILE.delete());
+		if (TEST_FILE.exists()) {
+			assertTrue(TEST_FILE.delete());
 		}
 
 		DirectoryTraverser directoryTraverser = new DirectoryTraverser();
 		DomProckBuilder builder = new DomProckBuilder(SOURCE_DIRECTORY);
 		directoryTraverser.traverse(SOURCE_DIRECTORY, builder);
 		builder.setPassword(PASSWORD);
-		builder.build(OUTPUT_FILE);
+		builder.build(TEST_FILE);
 		
-		assertTrue(OUTPUT_FILE.exists());
+		assertTrue(TEST_FILE.exists());
 	}
 	
 	@Test
@@ -110,7 +110,7 @@ public class Pr0ckTests {
 		if (!OUTPUT_TEST_DIR.exists()) {
 			OUTPUT_TEST_DIR.mkdirs();
 		}
-		ProckReader reader = new DomProckReader(OUTPUT_FILE);
+		ProckReader reader = new DomProckReader(TEST_FILE);
 		reader.setPassword(PASSWORD);
 		ProckDirectory rootDirectory = reader.load();
 		printDirectory(rootDirectory);
